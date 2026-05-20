@@ -204,12 +204,14 @@ class AddEmployeePage(BasePage):
 
     def enter_first_name(self, first_name: str):
         self.type_text(self.FIRST_NAME_INPUT, first_name)
+        self.wait_for_seconds(2)
 
     def enter_middle_name(self, middle_name: str):
         self.type_text(self.MIDDLE_NAME_INPUT, middle_name)
 
     def enter_last_name(self, last_name: str):
         self.type_text(self.LAST_NAME_INPUT, last_name)
+        self.wait_for_seconds(2)
 
     def get_employee_id(self) -> str:
         """Read the auto-generated Employee ID."""

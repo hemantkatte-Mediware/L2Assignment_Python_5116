@@ -9,7 +9,7 @@ Provides:
   • Screenshot helper
   • URL navigation
 """
-
+import time
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
@@ -129,6 +129,9 @@ class BasePage:
 
     def wait_for_text(self, locator: tuple, text: str):
         self.wait.until(EC.text_to_be_present_in_element(locator, text))
+    
+    def wait_for_seconds(self, seconds: int):
+        time.sleep(seconds)
 
     # ── Screenshot ────────────────────────────────────────────────────────────
 

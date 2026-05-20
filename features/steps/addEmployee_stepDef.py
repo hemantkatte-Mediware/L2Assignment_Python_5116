@@ -93,6 +93,18 @@ def step_enter_login_creds(context, username, password):
     context.employee_PageObj_Add.enter_login_password(password)
     context.employee_PageObj_Add.enter_confirm_password(password)
     
+@when('the user enters only first name "{first_name}"')
+def step_enter_only_first(context, first_name):
+    context.employee_PageObj_Add.enter_first_name(first_name)
+
+@when('the user enters only last name "{last_name}"')
+def step_enter_only_last(context, last_name):
+    context.employee_PageObj_Add.enter_last_name(last_name)
+
+@when('the user clicks the Save button without entering any data')
+def step_click_save_empty(context):
+    context.employee_PageObj_Add.click_save()
+    
 @then('the employee profile page should be displayed')
 def step_verify_profile_page(context):
     """
@@ -134,3 +146,24 @@ def step_verify_save_success(context):
     except Exception:
         # Toast already dismissed — URL check is sufficient
         logger.info("Success toast not found (may have auto-dismissed) — URL check passed")
+    
+@then('a required field validation error should appear for first name')
+def step_verify_first_name_error(context):
+    errors = context.employee_PageObj_Add.get_validation_errors()
+    assert len(errors) > 0, "Expected validation error for first name but none appeared"
+    assert any("required" in e.lower() for e in errors), \
+        f"Expected 'Required' error but got: {errors}"
+    logger.info(f"First name validation error confirmed: {errors}")
+
+@then('a required field validation error should appear for last name')
+def step_verify_last_name_error(context):
+    errors = context.employee_PageObj_Add.get_validation_errors()
+    assert len(errors) > 0, "Expected validation error for last name but none appeared"
+    logger.info(f"Last name validation error confirmed: {errors}")
+
+@then('multiple required field validation errors should be displayed')
+def step_verify_multiple_errors(context):
+    errors = context.employee_PageObj_Add.get_validation_errors()
+    assert len(errors) >= 2, \
+        f"Expected multiple validation errors but got {len(errors)}: {errors}"
+    logger.info(f"Multiple validation errors confirmed: {errors}")

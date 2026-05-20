@@ -69,8 +69,47 @@ Scenario: Search employee by full name returns exact match
   And the user searches for employee name "FullNameFirst FullNameLast"
   Then the search results should contain "FullNameFirst FullNameLast"
 
-@regression @searchtry
+@regression @search
 Scenario: Search with no filters returns all employees
   Given the user is on the Employee List page
   When the user clicks the Search button without entering any filters
   Then the search results should contain at least one record
+
+@regression @add @negativeadd
+Scenario: Add employee fails without first name
+  Given the user is on the Add Employee page
+  When the user enters only last name "LastName"
+  And the user clicks the Save button
+  Then a required field validation error should appear for first name
+
+@regression @add @negativeadd
+Scenario: Add employee fails without last name
+  Given the user is on the Add Employee page
+  When the user enters only first name "FirstName"
+  And the user clicks the Save button
+  Then a required field validation error should appear for last name
+
+@regression @add @negativeadd
+Scenario: Add employee fails with no data entered
+  Given the user is on the Add Employee page
+  When the user clicks the Save button without entering any data
+  Then multiple required field validation errors should be displayed
+
+@regression @search @negativesrch
+Scenario: Search with non-existent employee name returns no records
+  Given the user is on the Employee List page
+  When the user searches for employee name "XYZNONEXISTENT999"
+  Then "No Records Found" message should be displayed
+
+@regression @search @negativesrch
+Scenario: Search with non-existent employee ID returns no records
+  Given the user is on the Employee List page
+  When the user searches by employee ID "INVALID999"
+  Then "No Records Found" message should be displayed
+
+@regression @search @negativesrch
+Scenario: Search with special characters returns no records
+  Given the user is on the Employee List page
+  When the user searches for employee name "<script>alert('xss')</script>"
+  Then the application should handle the input safely
+  And no JavaScript injection should occur
