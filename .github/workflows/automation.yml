@@ -2,15 +2,9 @@
 # .github/workflows/automation.yml
 # =============================================================================
 # GitHub Actions CI/CD pipeline for OrangeHRM Automation Suite
-#
-# Triggers:
-#   push          → runs @smoke tests (fast feedback)
-#   pull_request  → runs @smoke + @regression
-#   schedule      → full nightly run at 2 AM UTC
-#   manual        → workflow_dispatch with tag input
 # =============================================================================
 
-name: Assignment for l2 Automation track
+name: OrangeHRM Automation
 
 on:
   push:
@@ -87,21 +81,13 @@ jobs:
       - name: Run Behave Tests
         continue-on-error: true
         env:
-          BASE_URL:      ${{ vars.BASE_URL || 'https://opensource-demo.orangehrmlive.com' }}
+          BASE_URL:      ${{ vars.BASE_URL || 'https://orangehrmlive.com' }}
           ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME || 'Admin' }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD || 'admin123' }}
           BROWSER:       ${{ github.event.inputs.browser || 'chrome' }}
           HEADLESS:      "true"
         run: |
-          behave \
-            --tags="${{ env.TAGS }}" \
-            --format allure_behave.formatter:AllureFormatter \
-            --outfile allure-results \
-            --format behave_html_formatter:HTMLFormatter \
-            --outfile reports/report.html \
-            --format progress2 \
-            --no-capture \
-          || true  # Don't fail the step — let report publishing happen first
+          behave --tags="${{ env.TAGS }}" --format allure_behave.formatter:AllureFormatter --outfile allure-results --format behave_html_formatter:HTMLFormatter --outfile reports/report.html --format progress2 --no-capture
 
       # 9. Upload HTML report
       - name: Upload HTML Report
@@ -112,7 +98,7 @@ jobs:
           path: reports/report.html
           retention-days: 30
 
-      # 10. Upload screenshots (always, most useful on failure)
+      # 10. Upload screenshots
       - name: Upload Screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -132,32 +118,13 @@ jobs:
           retention-days: 30
 
   # ──────────────────────────────────────────────────────────────────────────
-  # JOB 2: Notify on failure (Slack or email)
-  # ──────────────────────────────────────────────────────────────────────────
-  notify:
-    name: Notify on Failure
-    runs-on: ubuntu-latest
-    needs: test
-    if: failure()
-    steps:
-      - name: Send Failure Notification
-        run: |
-          echo "Tests failed! Workflow: ${{ github.workflow }}"
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Triggered by: ${{ github.actor }}"
-          # Add Slack / Teams webhook call here if needed:
-          # curl -X POST -H 'Content-type: application/json' \
-          #   --data '{"text":"OrangeHRM tests failed on ${{ github.ref_name }}"}' \
-          #   ${{ secrets.SLACK_WEBHOOK_URL }}
-  # ──────────────────────────────────────────────────────────────────────────
-  # JOB 3: write permissions for github pages deployment
+  # JOB 2: Native GitHub Pages Deployment
   # ──────────────────────────────────────────────────────────────────────────
   deploy-reports:
     runs-on: ubuntu-latest
-    needs: test                     # Waits for the test execution job to finish
-    if: always()                    # Runs even if some test scenarios fail
+    needs: test                     # Waits for Job 1 to upload results
+    if: always()                    # Runs even if test scenarios fail
     
-    # Grant the runner explicit access token rights to write code changes
     permissions:
       contents: read
       pages: write
