@@ -10,7 +10,7 @@
 #   manual        → workflow_dispatch with tag input
 # =============================================================================
 
-name: OrangeHRM Automation
+name: Assignment for l2 Automation track
 
 on:
   push:
@@ -130,17 +130,6 @@ jobs:
           path: allure-results/
           retention-days: 30
 
-      # 12. Generate and publish Allure HTML report
-      - name: Generate Allure Report
-        if: always()
-        uses: simple-elf/allure-report-action@master
-        with:
-          allure_results: allure-results
-          allure_report: allure-report
-          allure_history: allure-history
-          keep_reports: 10
-          gh_pages: gh-pages
-
   # ──────────────────────────────────────────────────────────────────────────
   # JOB 2: Notify on failure (Slack or email)
   # ──────────────────────────────────────────────────────────────────────────
@@ -159,8 +148,6 @@ jobs:
           # curl -X POST -H 'Content-type: application/json' \
           #   --data '{"text":"OrangeHRM tests failed on ${{ github.ref_name }}"}' \
           #   ${{ secrets.SLACK_WEBHOOK_URL }}
-          #
-          #NOT USED DUE TO SECURITY CONCERNS
   # ──────────────────────────────────────────────────────────────────────────
   # JOB 3: write permissions for github pages deployment
   # ──────────────────────────────────────────────────────────────────────────
