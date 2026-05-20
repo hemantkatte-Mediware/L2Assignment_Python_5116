@@ -53,11 +53,11 @@ class DriverFactory:
         if os.getenv("GITHUB_ACTIONS") == "true":
             # Points directly to the verified native Linux system chromedriver
             service = ChromeService(executable_path="/usr/local/bin/chromedriver")
-            return webdriver.Chrome(service=service, options=ChromeOptions)
+            return webdriver.Chrome(service=service, options=options)
         else:
             # Standard fallback for your local Windows development machine
             service = ChromeService(ChromeDriverManager().install())
-            return webdriver.Chrome(service=service, options=ChromeOptions)
+            return webdriver.Chrome(service=service, options=options)
 
         # If user provided an explicit path in settings, prefer it (validate)
         configured = getattr(settings, "CHROMEDRIVER_PATH", None)
