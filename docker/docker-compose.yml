@@ -1,0 +1,66 @@
+# =============================================================================
+# docker-compose.yml — OrangeHRM Automation
+# =============================================================================
+# Services:
+#   tests      – main automation container (headless Chrome)
+#   selenium   – optional Selenium Grid hub for distributed execution
+#   chrome     – Selenium Grid Chrome node
+# =============================================================================
+
+version: "3.9"
+
+services:
+  # ── Local headless execution ─────────────────────────────────────────────
+  tests:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: orangehrm_tests
+    environment:
+      - BASE_URL=https://opensource-demo.orangehrmlive.com
+      - BROWSER=chrome
+      - HEADLESS=true
+      - IMPLICIT_WAIT=10
+      - EXPLICIT_WAIT=30
+    volumes:
+      # Mount output directories so reports survive after container stops
+      - ../reports:/app/reports
+      - ../screenshots:/app/screenshots
+      - ../allure-results:/app/allure-results
+    command: >
+      behave
+        --format allure_behave.formatter:AllureFormatter --outfile allure-results
+        --format behave_html_formatter:HTMLFormatter     --outfile reports/report.html
+        --format progress2
+        --no-capture
+    networks:
+      - automation
+
+  # ── Selenium Grid Hub ─────────────────────────────────────────────────────
+  selenium-hub:
+    image: selenium/hub:4.18
+    container_name: selenium_hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+    networks:
+      - automation
+
+  # ── Chrome Node ───────────────────────────────────────────────────────────
+  chrome-node:
+    image: selenium/node-chrome:4.18
+    container_name: selenium_chrome
+    shm_size: "2gb"
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - automation
+
+networks:
+  automation:
+    driver: bridge

@@ -1,0 +1,11 @@
+first_name,last_name,middle_name,employee_id,username,password,expected_result
+John,Doe,,AUTO,,,"success"
+Jane,Smith,Marie,,,,success
+Alice,Brown,,EMP9901,,,"success"
+Bob,Wilson,,,bwilson_dd,Admin@1234,success
+Charlie,Davis,Thomas,,,,"success"
+DataDriven01,TestLast01,,,,,success
+DataDriven02,TestLast02,,,,,success
+DataDriven03,TestLast03,,,,,success
+,NoFirst,,,,,"failure"
+NoLast,,,,,,"failure"
