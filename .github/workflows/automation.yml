@@ -141,14 +141,6 @@ jobs:
           keep_reports: 10
           gh_pages: gh-pages
 
-      - name: Publish Allure Report to GitHub Pages
-        if: always() && github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: allure-report
-
   # ──────────────────────────────────────────────────────────────────────────
   # JOB 2: Notify on failure (Slack or email)
   # ──────────────────────────────────────────────────────────────────────────
@@ -174,11 +166,41 @@ jobs:
   # ──────────────────────────────────────────────────────────────────────────
   deploy-reports:
     runs-on: ubuntu-latest
+    needs: test                     # Waits for the test execution job to finish
+    if: always()                    # Runs even if some test scenarios fail
     
     # Grant the runner explicit access token rights to write code changes
     permissions:
       contents: write
+      pages: write
+      id-token: write
       
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      # 1. Download the Allure raw results built in the test job
+      - name: Download Allure Results
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-${{ github.run_number }}
+          path: allure-results
+
+      # 2. Re-compile the raw data into HTML format
+      - name: Generate Allure Report
+        uses: simple-elf/allure-report-action@master
+        with:
+          allure_results: allure-results
+          allure_report: allure-report
+          keep_reports: 10
+
+      # 3. Pack the output directory as a native page asset
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+
+      # 4. Deploy the packed asset directly to the live GitHub web servers
+      - name: Deploy to GitHub Pages Website
+        id: deployment
+        uses: actions/deploy-pages@v4
