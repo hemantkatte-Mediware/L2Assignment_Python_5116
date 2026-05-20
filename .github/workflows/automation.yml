@@ -4,7 +4,14 @@
 # GitHub Actions CI/CD pipeline for OrangeHRM Automation Suite
 # =============================================================================
 
-name: OrangeHRM Automation
+name: L2 Automation track
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+on:
+  push:
+    branches: [ main, develop ]
 
 on:
   push:
