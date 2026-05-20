@@ -81,11 +81,12 @@ jobs:
       - name: Run Behave Tests
         continue-on-error: true
         env:
-          BASE_URL:      ${{ vars.BASE_URL || 'https://orangehrmlive.com' }}
+          BASE_URL:      ${{ vars.BASE_URL || 'https://opensource-demo.orangehrmlive.com' }}
           ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME || 'Admin' }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD || 'admin123' }}
           BROWSER:       ${{ github.event.inputs.browser || 'chrome' }}
           HEADLESS:      "true"
+          webdriver.chrome.driver: ${{ env.CHROMEWEBDRIVER }}/chromedriver
         run: |
           behave --tags="${{ env.TAGS }}" --format allure_behave.formatter:AllureFormatter --outfile allure-results --format behave_html_formatter:HTMLFormatter --outfile reports/report.html --format progress2 --no-capture
 
