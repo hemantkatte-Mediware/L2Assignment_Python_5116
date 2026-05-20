@@ -166,3 +166,18 @@ jobs:
           # curl -X POST -H 'Content-type: application/json' \
           #   --data '{"text":"OrangeHRM tests failed on ${{ github.ref_name }}"}' \
           #   ${{ secrets.SLACK_WEBHOOK_URL }}
+          #
+          #NOT USED DUE TO SECURITY CONCERNS
+  # ──────────────────────────────────────────────────────────────────────────
+  # JOB 3: write permissions for github pages deployment
+  # ──────────────────────────────────────────────────────────────────────────
+  deploy-reports:
+    runs-on: ubuntu-latest
+    
+    # Grant the runner explicit access token rights to write code changes
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
