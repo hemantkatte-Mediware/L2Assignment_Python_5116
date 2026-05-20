@@ -52,7 +52,14 @@ class DriverFactory:
         
         if os.getenv("GITHUB_ACTIONS") == "true":
             # Points directly to the verified native Linux system chromedriver
-            service = ChromeService(executable_path="/usr/local/bin/chromedriver")
+           actions_driver_dir = os.getenv("CHROMEWEBDRIVER")
+            if actions_driver_dir:
+                driver_path = os.path.join(actions_driver_dir, "chromedriver")
+            else:
+                driver_path = "/usr/local/bin/chromedriver" # Safe fallback
+                
+            logger.info(f"CI environment detected. Using driver path: {driver_path}")
+            service = ChromeService(executable_path=driver_path)
             return webdriver.Chrome(service=service, options=options)
         else:
             # Standard fallback for your local Windows development machine
