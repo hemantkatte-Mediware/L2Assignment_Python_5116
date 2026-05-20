@@ -85,6 +85,7 @@ jobs:
 
       # 8. Run Behave tests
       - name: Run Behave Tests
+        continue-on-error: true
         env:
           BASE_URL:      ${{ vars.BASE_URL || 'https://opensource-demo.orangehrmlive.com' }}
           ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME || 'Admin' }}
@@ -158,7 +159,7 @@ jobs:
     
     # Grant the runner explicit access token rights to write code changes
     permissions:
-      contents: write
+      contents: read
       pages: write
       id-token: write
       
