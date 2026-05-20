@@ -63,8 +63,13 @@ class DriverFactory:
             return webdriver.Chrome(service=service, options=options)
         else:
             # Standard fallback for your local Windows development machine
-            service = ChromeService(ChromeDriverManager().install())
-            return webdriver.Chrome(service=service, options=options)
+            logger.info("Local environment detected. Launching browser via Selenium Manager.")
+            driver = webdriver.Chrome(options=options)
+            try:
+                driver.maximize_window()
+            except Exception:
+                logger.debug("Could not maximize window layout")
+            return driver
 
         # If user provided an explicit path in settings, prefer it (validate)
         configured = getattr(settings, "CHROMEDRIVER_PATH", None)
