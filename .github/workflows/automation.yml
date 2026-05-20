@@ -12,10 +12,6 @@ env:
 on:
   push:
     branches: [ main, develop ]
-
-on:
-  push:
-    branches: [ main, develop ]
   pull_request:
     branches: [ main ]
   schedule:
