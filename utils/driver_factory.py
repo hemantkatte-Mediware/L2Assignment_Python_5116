@@ -52,7 +52,7 @@ class DriverFactory:
         
         if os.getenv("GITHUB_ACTIONS") == "true":
             # Points directly to the verified native Linux system chromedriver
-           actions_driver_dir = os.getenv("CHROMEWEBDRIVER")
+            actions_driver_dir = os.getenv("CHROMEWEBDRIVER")
             if actions_driver_dir:
                 driver_path = os.path.join(actions_driver_dir, "chromedriver")
             else:
