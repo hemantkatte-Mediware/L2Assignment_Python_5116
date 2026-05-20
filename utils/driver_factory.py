@@ -34,7 +34,7 @@ class DriverFactory:
         driver.set_page_load_timeout(settings.PAGE_LOAD_TIMEOUT)
         driver.set_window_size(settings.BROWSER_WIDTH, settings.BROWSER_HEIGHT)
 
-        logger.info(f"Browser started: {driver.capabilities.get('browserName', browser)}")
+        logger.info(f"Browser started successfully for: {browser}")
         return driver
 
     @staticmethod
