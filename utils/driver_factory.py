@@ -44,14 +44,24 @@ class DriverFactory:
     @staticmethod
     def _get_chrome_driver() -> webdriver.Chrome:
         options = ChromeOptions()
+        
         if settings.HEADLESS:
             options.add_argument("--headless=new")
             options.add_argument("--window-size=1920,1080")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--disable-extensions")
-        options.add_argument("--log-level=3")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--disable-gpu")
+            options.add_argument("--disable-extensions")
+            options.add_argument("--log-level=3")
+        
+        if os.getenv("GITHUB_ACTIONS") == "true":
+            # Points directly to the verified native Linux system chromedriver
+            service = Service(executable_path="/usr/local/bin/chromedriver")
+            return webdriver.Chrome(service=service, options=chrome_options)
+        else:
+            # Standard fallback for your local Windows development machine
+            service = Service(ChromeDriverManager().install())
+            return webdriver.Chrome(service=service, options=chrome_options)
 
         # If user provided an explicit path in settings, prefer it (validate)
         configured = getattr(settings, "CHROMEDRIVER_PATH", None)
