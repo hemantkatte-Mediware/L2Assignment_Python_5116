@@ -75,9 +75,9 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "TAGS=${{ github.event.inputs.tags }}" >> $GITHUB_ENV
           elif [ "${{ github.event_name }}" = "push" ]; then
-            echo "TAGS=@smoke" >> $GITHUB_ENV
+            echo "TAGS=" >> $GITHUB_ENV # <-- Leave blank to run ALL test cases on push
           else
-            echo "TAGS=@smoke,@regression" >> $GITHUB_ENV
+            echo "TAGS=" >> $GITHUB_ENV # <-- Leave blank to run ALL test cases on scheduled runs
           fi
 
       # 8. Run Behave tests
