@@ -4,7 +4,7 @@ Background:
   Given the user is logged into the OrangeHRM application
 
 #Add Employee
-@smoke @employee
+@smoke @employee @add
 Scenario: Add a new employee with mandatory fields only
   Given the user is on the Add Employee page
   Then the Employee ID field should contain an auto-generated value
@@ -12,7 +12,7 @@ Scenario: Add a new employee with mandatory fields only
   And the user clicks the Save button
   Then the employee profile page should be displayed
 
-@regression @add
+@regression @addtry
 Scenario: Add employee with full name and Specific employee ID with login Credentials
   Given the user is on the Add Employee page
   When the user enters first name "L1" and middle name "Automation" and last name "Track"

@@ -200,7 +200,10 @@ class AddEmployeePage(BasePage):
     def navigate(self):
         self.open(self.ADD_URL)
         self.find_element(self.FIRST_NAME_INPUT)
+        emp_id = self.generate_unique_emp_id()
+        self.set_employee_id(emp_id)
         logger.info("Add Employee page loaded")
+        return emp_id
 
     def enter_first_name(self, first_name: str):
         self.type_text(self.FIRST_NAME_INPUT, first_name)
@@ -255,13 +258,7 @@ class AddEmployeePage(BasePage):
     def click_cancel(self):
         self.click(self.CANCEL_BUTTON)
 
-    def fill_employee_form(
-        self,
-        first_name:   str,
-        last_name:    str,
-        middle_name:  str = "",
-        employee_id:  str = None
-    ) -> str:
+    def fill_employee_form(self, first_name: str, last_name: str, middle_name: str = "", employee_id: str = None) -> str:
         """
         Fills only the mandatory fields.
         Returns the Employee ID (auto-generated or set).
@@ -271,13 +268,18 @@ class AddEmployeePage(BasePage):
             self.enter_middle_name(middle_name)
         self.enter_last_name(last_name)
 
-        if employee_id:
-            self.set_employee_id(employee_id)
+        if not employee_id:
+            self.generate_unique_emp_id()
+        
+        self.set_employee_id(employee_id)
 
         # Read the ID AFTER potentially setting it
-        generated_id = self.get_employee_id()
-        logger.info(f"Employee form filled: {first_name} {last_name} | ID: {generated_id}")
-        return generated_id
+        logger.info(f"Employee form filled: {first_name} {last_name} | ID: {employee_id}")
+        return employee_id
+    
+    def generate_unique_emp_id(self) -> str:
+        from datetime import datetime
+        return datetime.now().strftime("%m%d%H%M%S")        
 
     # def save_and_wait(self):
     #     """Click save and wait for the redirect to Personal Details."""

@@ -11,7 +11,8 @@ logger = get_logger("steps.addEmployee")
 @given('the user is on the Add Employee page')
 def step_navigate_add_employee(context):
     """Navigate to Add Employee page (user is already logged in via Background)."""
-    context.employee_PageObj_Add.navigate()
+    emp_id = context.employee_PageObj_Add.navigate()
+    context.employee_id=emp_id
     assert context.employee_PageObj_Add.is_on_add_employee_page(), \
         "Failed to navigate to Add Employee page"
     logger.info("On Add Employee page")
@@ -27,10 +28,12 @@ def step_add_employee_to_system(context, full_name):
     first = parts[0]
     last  = parts[-1] if len(parts) > 1 else "Employee"
 
-    context.employee_PageObj_Add.navigate()
+    emp_id = context.employee_PageObj_Add.navigate()
+    context.employee_id=emp_id
     emp_id = context.employee_PageObj_Add.fill_employee_form(
         first_name=first,
-        last_name=last
+        last_name=last,
+        employee_id=emp_id
     )
     context.employee_PageObj_Add.save_and_wait()
 
@@ -43,10 +46,11 @@ def step_add_employee_to_system(context, full_name):
 @given('a new employee with a known employee ID exists in the system')
 def step_add_employee_with_known_id(context):
     """Creates an employee and stores the ID for search assertions."""
-    context.employee_PageObj_Add.navigate()
+    emp_id = context.employee_PageObj_Add.navigate()
     emp_id = context.employee_PageObj_Add.fill_employee_form(
         first_name="SearchById",
-        last_name="TestEmployee"
+        last_name="TestEmployee",
+        employee_id=emp_id
     )
     context.employee_PageObj_Add.save_and_wait()
     context.employee_id   = emp_id
@@ -59,6 +63,8 @@ def step_enter_name(context, first_name, last_name):
     context.employee_PageObj_Add.enter_first_name(first_name)
     context.employee_PageObj_Add.enter_last_name(last_name)
     # Track what we just entered for assertion steps
+    context.generated_unique_id = context.employee_PageObj_Add.generate_unique_emp_id()
+    
     context.employee_name = f"{first_name} {last_name}"
     logger.info(f"Entered employee name: {context.employee_name}")
 
