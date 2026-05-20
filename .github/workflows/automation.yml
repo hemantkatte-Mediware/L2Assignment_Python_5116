@@ -89,8 +89,17 @@ jobs:
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD || 'admin123' }}
           BROWSER:       ${{ github.event.inputs.browser || 'chrome' }}
           HEADLESS:      "true"
+        # run: |
+        #   behave --tags="${{ env.TAGS }}" --format allure_behave.formatter:AllureFormatter --outfile allure-results --format behave_html_formatter:HTMLFormatter --outfile reports/report.html --format progress2 --no-capture
         run: |
-          behave --tags="${{ env.TAGS }}" --format allure_behave.formatter:AllureFormatter --outfile allure-results --format behave_html_formatter:HTMLFormatter --outfile reports/report.html --format progress2 --no-capture
+          # Dynamic fallback check: If TAGS is empty or completely missing, force override to ~@none
+          if [ -z "${TAGS}" ] || [ "${TAGS}" = '""' ] || [ "${TAGS}" = " " ]; then
+            export FINAL_TAGS="~@none"
+          else
+            export FINAL_TAGS="${TAGS}"
+          fi
+          
+          behave --tags="$FINAL_TAGS" --format allure_behave.formatter:AllureFormatter --outfile allure-results --format behave_html_formatter:HTMLFormatter --outfile reports/report.html --format progress2 --no-capture
 
       # 9. Upload HTML report
       - name: Upload HTML Report
