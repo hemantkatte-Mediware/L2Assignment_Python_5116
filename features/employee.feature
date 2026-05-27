@@ -4,7 +4,7 @@ Background:
   Given the user is logged into the OrangeHRM application
 
 #Add Employee
-@smoke @add
+@regression @smoke @add
 Scenario: Add a new employee with mandatory fields only
   Given the user is on the Add Employee page
   Then the Employee ID field should contain an auto-generated value
@@ -37,7 +37,7 @@ Scenario Outline: Add multiple employees using data table
     | DataUser04  | TestLast04  |
     | DataUser05  | TestLast05  |
 
-@smoke @search
+@regression @smoke @search
 Scenario: Search employee by first name returns results
   Given a new employee "FullNameFirst FullNameLast" has been added to the system
   When the user clicks the Save button
