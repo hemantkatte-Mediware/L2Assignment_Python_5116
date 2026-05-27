@@ -67,11 +67,11 @@ jobs:
         with:
           chrome-version: stable
 
-      - name: Install Firefox
+      - name: Install Firefox Browser and Binary Path
         if: github.event.inputs.browser == 'firefox'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y firefox
+        uses: browser-actions/setup-firefox@v1
+        with:
+          firefox-version: 'latest'
 
       - name: Install Microsoft Edge
         if: github.event.inputs.browser == 'edge'
