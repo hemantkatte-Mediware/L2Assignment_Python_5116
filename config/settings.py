@@ -13,13 +13,10 @@ logger = logging.getLogger(__name__)
 class Settings:
     # Application
     BASE_URL = os.getenv(f"{ENVIRONMENT.upper()}_URL") or os.getenv("BASE_URL")
-    
-    # Restructured to prevent Windows system username fallback injection loops
     USERNAME = os.getenv("ADMIN_USERNAME") or os.getenv("APP_USERNAME")
     PASSWORD = os.getenv("ADMIN_PASSWORD") or os.getenv("APP_PASSWORD")
 
-    # ── Browser controls ──────────────────────────────────────
-    # Restored to old fallback prioritizing system shell parameters over environment variables
+    # Browser
     BROWSER: str         = os.environ.get("BROWSER") or os.getenv("BROWSER", "chrome").lower()
     HEADLESS: bool       = (os.environ.get("HEADLESS") or os.getenv("HEADLESS", "false")).lower() == "true"
     

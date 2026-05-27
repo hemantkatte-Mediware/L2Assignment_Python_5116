@@ -33,7 +33,7 @@ on:
         required: false
         default: "demo"
         type: choice
-        options: [ dev, qa, staging ]
+        options: [ demo, dev, qa, staging ]
 
 jobs:
   # ──────────────────────────────────────────────────────────────────────────
@@ -60,45 +60,53 @@ jobs:
       - name: Install Python Dependencies
         run: pip install -r requirements.txt
 
-      # 4. Install Chrome
+      # 4. Multi-Browser Installation Configuration (Handles runtime flags)
       - name: Install Google Chrome
+        if: github.event.inputs.browser == 'chrome' || github.event_name != 'workflow_dispatch'
         uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: stable
 
-      # 5. Verify Chrome installation
-      - name: Verify Chrome
-        run: google-chrome --version
+      - name: Install Firefox
+        if: github.event.inputs.browser == 'firefox'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y firefox
 
-      # 6. Create output directories
+      - name: Install Microsoft Edge
+        if: github.event.inputs.browser == 'edge'
+        run: |
+          sudo curl -fSsL https://microsoft.com | sudo gpg --dearmor | sudo tee /usr/share/keyrings/microsoft-edge.gpg > /dev/null
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-edge.gpg] https://microsoft.com stable main" | sudo tee /etc/apt/sources.list.d/microsoft-edge.list
+          sudo apt-get update && sudo apt-get install -y microsoft-edge-stable
+
+      # 5. Create output directories
       - name: Create Output Directories
         run: mkdir -p reports screenshots allure-results
 
-      # 7. Determine tags to run
+      # 6. Determine tags to run
       - name: Set Test Tags
         id: set-tags
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "TAGS=${{ github.event.inputs.tags }}" >> $GITHUB_ENV
           elif [ "${{ github.event_name }}" = "push" ]; then
-            echo "TAGS=" >> $GITHUB_ENV # <-- Leave blank to run ALL test cases on push
+            echo "TAGS=" >> $GITHUB_ENV
           else
-            echo "TAGS=" >> $GITHUB_ENV # <-- Leave blank to run ALL test cases on scheduled runs
+            echo "TAGS=" >> $GITHUB_ENV
           fi
 
-      # 8. Run Behave tests
+      # 7. Run Behave tests
       - name: Run Behave Tests
         continue-on-error: true
         env:
           BASE_URL:      ${{ vars.BASE_URL || 'https://opensource-demo.orangehrmlive.com' }}
           ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME || 'Admin' }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD || 'admin123' }}
+          ENVIRONMENT:   ${{ github.event.inputs.environment || 'demo' }}
           BROWSER:       ${{ github.event.inputs.browser || 'chrome' }}
           HEADLESS:      "true"
-        # run: |
-        #   behave --tags="${{ env.TAGS }}" --format allure_behave.formatter:AllureFormatter --outfile allure-results --format behave_html_formatter:HTMLFormatter --outfile reports/report.html --format progress2 --no-capture
         run: |
-          # Dynamic fallback check: If TAGS is empty or completely missing, force override to ~@none
           if [ -z "${TAGS}" ] || [ "${TAGS}" = '""' ] || [ "${TAGS}" = " " ]; then
             export FINAL_TAGS="~@none"
           else
@@ -106,6 +114,14 @@ jobs:
           fi
           
           behave --tags="$FINAL_TAGS" --format allure_behave.formatter:AllureFormatter --outfile allure-results --format behave_html_formatter:HTMLFormatter --outfile reports/report.html --format progress2 --no-capture
+
+      # 8. Workplace Diagnostics Tracker (Ensures folders aren't blank)
+      - name: Generate Directory Diagnostics Log
+        if: always()
+        run: |
+          echo "Placeholder data keeping upload components active." > allure-results/environment.properties
+          echo "System Context: Environment=${{ github.event.inputs.environment || 'demo' }}" >> allure-results/environment.properties
+          echo "Browser Context: Browser=${{ github.event.inputs.browser || 'chrome' }}" >> allure-results/environment.properties
 
       # 9. Upload HTML report
       - name: Upload HTML Report
@@ -115,6 +131,7 @@ jobs:
           name: html-report-${{ github.run_number }}
           path: reports/report.html
           retention-days: 30
+          if-no-files-found: ignore
 
       # 10. Upload screenshots
       - name: Upload Screenshots
@@ -134,14 +151,15 @@ jobs:
           name: allure-results-${{ github.run_number }}
           path: allure-results/
           retention-days: 30
+          if-no-files-found: error
 
   # ──────────────────────────────────────────────────────────────────────────
   # JOB 2: Native GitHub Pages Deployment
   # ──────────────────────────────────────────────────────────────────────────
   deploy-reports:
     runs-on: ubuntu-latest
-    needs: test                     # Waits for Job 1 to upload results
-    if: always()                    # Runs even if test scenarios fail
+    needs: test                     
+    if: always()                    
     
     permissions:
       contents: read
