@@ -28,6 +28,12 @@ on:
         default: "chrome"
         type: choice
         options: [ chrome, firefox, edge ]
+      environment:
+        description: "Target Application Testing Environment"
+        required: false
+        default: "demo"
+        type: choice
+        options: [ dev, qa, staging ]
 
 jobs:
   # ──────────────────────────────────────────────────────────────────────────
