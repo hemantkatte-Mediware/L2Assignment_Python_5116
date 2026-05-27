@@ -56,7 +56,6 @@ def step_add_employee_with_known_id(context):
     context.employee_id   = emp_id
     context.employee_name = "SearchById TestEmployee"
     logger.info(f"Employee created for ID search: {emp_id}")
-
     
 @when('the user enters first name "{first_name:w}" and last name "{last_name:w}"')
 def step_enter_name(context, first_name, last_name):
