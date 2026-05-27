@@ -11,6 +11,9 @@ load_dotenv(dotenv_path=PROJECT_ROOT / ".env", override=False)
 logger = logging.getLogger(__name__)
 
 class Settings:
+    # Environmnet
+    ENVIRONMENT: str  = os.getenv("ENVIRONMENT", "demo").lower()
+    
     # Application
     BASE_URL = os.getenv(f"{ENVIRONMENT.upper()}_URL") or os.getenv("BASE_URL")
     USERNAME = os.getenv("ADMIN_USERNAME") or os.getenv("APP_USERNAME")
