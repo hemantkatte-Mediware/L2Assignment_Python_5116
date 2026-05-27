@@ -167,7 +167,8 @@ behave --tags @regression     # full suite
 behave --tags @add            # only Add Employee scenarios
 behave --tags @search         # only Search Employee scenarios
 behave --tags @negative       # only negative/failure scenarios
-behave --tags "@add and @positive"   # add + positive only
+behave --tags @negativeadd    # only add employee negative
+behave --tags @negativesearch # only search employee negative
 ```
 
 ### Run with HTML report
@@ -362,7 +363,7 @@ docker-compose up
 
 ---
 
-## 12. Data-Driven Testing
+## 11. Data-Driven Testing
 
 ### Scenario Outline (inline)
 In the feature file, multiple employees are tested using `Examples:` tables:
@@ -386,7 +387,7 @@ for emp in employees:
 
 ---
 
-## 13. Debugging Guide
+## 12. Debugging Guide
 
 ### Common Issues
 
@@ -419,7 +420,7 @@ Fix: Re-find the element after any page action. Never store element references a
 
 ---
 
-## 14. Architecture Decisions
+## 13. Architecture Decisions
 
 | Decision | Rationale |
 |---|---|
