@@ -75,10 +75,9 @@ jobs:
 
       - name: Install Microsoft Edge
         if: github.event.inputs.browser == 'edge'
-        run: |
-          sudo curl -fSsL https://microsoft.com | sudo gpg --dearmor | sudo tee /usr/share/keyrings/microsoft-edge.gpg > /dev/null
-          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-edge.gpg] https://microsoft.com stable main" | sudo tee /etc/apt/sources.list.d/microsoft-edge.list
-          sudo apt-get update && sudo apt-get install -y microsoft-edge-stable
+        uses: browser-actions/setup-edge@v1
+        with:
+          edge-version: stable
 
       # 5. Create output directories
       - name: Create Output Directories
@@ -113,12 +112,13 @@ jobs:
             export FINAL_TAGS="${TAGS}"
           fi
           
-          behave --tags="$FINAL_TAGS" --format allure_behave.formatter:AllureFormatter --outfile allure-results --format behave_html_formatter:HTMLFormatter --outfile reports/report.html --format progress2 --no-capture
+          behave --tags="$FINAL_TAGS" --format allure_behave.formatter:AllureFormatter --outfile "${{ github.workspace }}/allure-results" --format behave_html_formatter:HTMLFormatter --outfile "${{ github.workspace }}/reports/report.html" --format progress2 --no-capture
 
       # 8. Workplace Diagnostics Tracker (Ensures folders aren't blank)
       - name: Generate Directory Diagnostics Log
         if: always()
         run: |
+          mkdir -p allure-results
           echo "Placeholder data keeping upload components active." > allure-results/environment.properties
           echo "System Context: Environment=${{ github.event.inputs.environment || 'demo' }}" >> allure-results/environment.properties
           echo "Browser Context: Browser=${{ github.event.inputs.browser || 'chrome' }}" >> allure-results/environment.properties
