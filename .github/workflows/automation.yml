@@ -179,7 +179,7 @@ jobs:
 
       # 2. Fetch historical test data from your live gh-pages branch deployment
       - name: Get Allure History Data Profile
-        const: get-history
+        id: get-history
         continue-on-error: true
         uses: actions/checkout@v4
         with:
