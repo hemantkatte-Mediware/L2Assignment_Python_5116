@@ -191,23 +191,21 @@ jobs:
         if: always()
         run: |
           mkdir -p allure-results/history
-          # Extract and copy tracking files from your live deployment storage path
-          cp -R gh-pages-dir/history/* allure-results/history/ || echo "No previous pipeline run history discovered."
+          if [ -d "gh-pages-dir/history" ]; then
+            cp -R gh-pages-dir/history/* allure-results/history/ || echo "No previous history folder found."
+          fi
 
-      # 4. Generate the consolidated Allure Report
+      # 4. Generate the consolidated Allure Report with historical trend line compilation
       - name: Compile Unified Allure Report
         uses: simple-elf/allure-report-action@master
         with:
           allure_results: allure-results
           allure_report: allure-report
-          keep_reports: 20          # Retain up to 20 historical execution cycles in your charts
+          keep_reports: 20
 
-      # 5. Pack and Deploy the packed asset directly to the live GitHub web servers
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
+      # 5. Deploy the compiled report directly back to the gh-pages branch layout
+      - name: Deploy Report directly to gh-pages Branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: allure-report
-
-      - name: Deploy to GitHub Pages Website
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
