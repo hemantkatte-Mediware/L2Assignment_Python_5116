@@ -95,19 +95,19 @@ Scenario: Add employee fails with no data entered
   When the user clicks the Save button without entering any data
   Then multiple required field validation errors should be displayed
 
-@regression @search @negativesrch
+@regression @search @negativesearch
 Scenario: Search with non-existent employee name returns no records
   Given the user is on the Employee List page
   When the user searches for employee name "XYZNONEXISTENT999"
   Then "No Records Found" message should be displayed
 
-@regression @search @negativesrch
+@regression @search @negativesearch
 Scenario: Search with non-existent employee ID returns no records
   Given the user is on the Employee List page
   When the user searches by employee ID "INVALID999"
   Then "No Records Found" message should be displayed
 
-@regression @search @negativesrch
+@regression @search @negativesearch
 Scenario: Search with special characters returns no records
   Given the user is on the Employee List page
   When the user searches for employee name "<script>alert('xss')</script>"

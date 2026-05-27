@@ -334,4 +334,3 @@ class AddEmployeePage(BasePage):
     def is_save_successful(self) -> bool:
         """True if the page redirected to employee profile after save."""
         return "viewPersonalDetails" in self.get_current_url()
-    

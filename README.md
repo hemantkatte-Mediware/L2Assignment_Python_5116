@@ -37,7 +37,7 @@ on the [OrangeHRM Demo Site](https://opensource-demo.orangehrmlive.com) using:
 | Workflow | Scenarios |
 |---|---|
 | Login | Valid login, invalid credentials, empty fields |
-| Add Employee | Mandatory fields, all fields, custom ID, login toggle, validation errors |
+| Add Employee | Mandatory fields, all fields, custom ID, validation errors |
 | Search Employee | By name, by ID, by full name, no filters, reset, no results |
 | End-to-End | Add → Search full flow |
 
@@ -47,14 +47,13 @@ on the [OrangeHRM Demo Site](https://opensource-demo.orangehrmlive.com) using:
 
 | Tool | Purpose | Version |
 |---|---|---|
-| Python | Language | 3.11+ |
-| Selenium | Browser automation | 4.18 |
+| Python | Language | 3.13.6 |
+| Selenium | Browser automation | 4.18.1 |
 | Behave | BDD test runner (Gherkin) | 1.2.6 |
 | webdriver-manager | Auto-downloads ChromeDriver | 4.0.1 |
 | allure-behave | Allure report integration | 2.13.5 |
 | behave-html-formatter | HTML report | 0.9.10 |
 | python-dotenv | Environment config | 1.0.1 |
-| colorlog | Coloured logging | 6.8.2 |
 | Docker | Container execution | 24+ |
 | GitHub Actions | CI/CD | — |
 
@@ -65,43 +64,42 @@ on the [OrangeHRM Demo Site](https://opensource-demo.orangehrmlive.com) using:
 ```
 orangehrm-automation/
 │
-├── .env                          # Environment variables (browser, URLs, creds)
-├── behave.ini                    # Behave runner configuration
-├── requirements.txt              # Python dependencies
-├── run_tests.sh                  # Convenience shell script
+├── .env                                # Environment variables (browser, URLs, creds)
+├── behave.ini                          # Behave runner configuration
+├── requirements.txt                    # Python dependencies
 │
 ├── config/
 │   ├── __init__.py
-│   └── settings.py               # Typed settings loaded from .env
+│   └── settings.py                     # Typed settings loaded from .env
 │
 ├── features/
-│   ├── environment.py            # Behave hooks (before/after scenario, screenshots)
-│   └── add_search_employee.feature  # ALL Gherkin scenarios
-│
-├── steps/
-│   ├── __init__.py
-│   ├── login_steps.py            # Login step definitions
-│   ├── add_employee_steps.py     # Add Employee step definitions
-│   └── search_employee_steps.py  # Search Employee step definitions
-│
+│   ├── environment.py                  # Behave hooks (before/after scenario, screenshots)
+│   ├── employee.feature                # ALL Gherkin scenarios for add and search employee
+│   ├── login.feature                   # ALL Gherkin scenarios for Login
+│   └── steps/
+│       ├── __init__.py
+│       ├── login_steps.py              # Login step definitions
+│       ├── addEmployee_stepDef.py      # Add Employee step definitions
+│       └── searchEmployee_stepDef.py   # Search Employee step definitions
+││
 ├── pages/
 │   ├── __init__.py
-│   ├── base_page.py              # Base Page Object (all shared Selenium actions)
-│   ├── login_page.py             # Login page locators + actions
-│   └── pim_page.py               # PIM module: AddEmployeePage + PIMPage
+│   ├── base_page.py                    # Base Page Object (all shared Selenium actions)
+│   ├── base_page.py                    # Home page locators + validation
+│   ├── login_page.py                   # Login page locators + actions
+│   └── pim_page.py                     # PIM module: AddEmployeePage + PIMPage
 │
 ├── utils/
 │   ├── __init__.py
-│   ├── driver_factory.py         # WebDriver factory (Chrome/Firefox/Edge)
-│   ├── helpers.py                # Screenshots, logger, wait helpers
-│   └── data_reader.py            # CSV test data reader
+│   ├── driver_factory.py               # WebDriver factory (Chrome/Firefox/Edge)
+│   └── helpers.py                      # Screenshots, logger, wait helpers
 │
 ├── data/
-│   └── employee_data.csv         # Data-driven test input
+│   └── employee_data.csv               # Data-driven test input
 │
-├── reports/                      # HTML reports output (git-ignored)
-├── screenshots/                  # PNG screenshots (git-ignored)
-├── allure-results/               # Allure raw data (git-ignored)
+├── reports/                            # HTML reports output
+├── screenshots/                        # PNG screenshots (git-ignored)
+├── allure-results/                     # Allure raw data (git-ignored)
 │
 ├── docker/
 │   ├── Dockerfile                # Container definition
@@ -117,25 +115,21 @@ orangehrm-automation/
 ## 4. Setup Instructions
 
 ### Prerequisites
-- Python 3.11+
+- Python 3.11+ (We used 3.13.6)
 - Google Chrome (latest stable)
 - Git
 
 ### Step 1 — Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/orangehrm-automation.git
-cd orangehrm-automation
+git clone https://github.com/hemantkatte-Mediware/L2Assignment_Python_5116.git
+cd L2Assignment_Python_5116
 ```
 
 ### Step 2 — Create and activate a virtual environment
 ```bash
 python -m venv venv
 
-# macOS / Linux
-source venv/bin/activate
-
-# Windows
-venv\Scripts\activate
+.\venv\Scripts\activate
 ```
 
 ### Step 3 — Install dependencies
@@ -146,15 +140,15 @@ pip install -r requirements.txt
 
 ### Step 4 — Configure environment
 ```bash
-cp .env .env.local       # optional: keep your local overrides
+cp .env 
 ```
 Edit `.env` to change browser, headless mode, or credentials:
 ```dotenv
 BROWSER=chrome           # chrome | firefox | edge
 HEADLESS=false           # true for CI / Docker
 BASE_URL=https://opensource-demo.orangehrmlive.com
-ADMIN_USERNAME=Admin
-ADMIN_PASSWORD=admin123
+APP_USERNAME=Admin
+APP_PASSWORD=admin123
 ```
 
 ---
@@ -162,8 +156,8 @@ ADMIN_PASSWORD=admin123
 ## 5. Running Tests
 
 ### Run all tests
-```bash
-behave
+```
+python -m behave
 ```
 
 ### Run by tag
@@ -178,21 +172,13 @@ behave --tags "@add and @positive"   # add + positive only
 
 ### Run with HTML report
 ```bash
-behave --format behave_html_formatter:HTMLFormatter --outfile reports/report.html
+$env:BROWSER="chrome"; behave --tags "@smoke" --format behave_html_formatter:HTMLFormatter --outfile reports/report.html
 ```
 
 ### Run with Allure report
 ```bash
-behave --format allure_behave.formatter:AllureFormatter --outfile allure-results
+$env:BROWSER="chrome"; behave --format allure_behave.formatter:AllureFormatter --outfile allure-results --format behave_html_formatter:HTMLFormatter --outfile reports/report.html
 allure serve allure-results    # opens browser with interactive report
-```
-
-### Run using the shell script
-```bash
-chmod +x run_tests.sh
-./run_tests.sh              # all tests
-./run_tests.sh smoke        # @smoke only
-./run_tests.sh regression   # @regression
 ```
 
 ### Run headless (no browser window)
@@ -209,24 +195,23 @@ HEADLESS=true behave --tags @smoke
 |---|---|
 | `@smoke` | Critical happy-path, runs on every push (fast) |
 | `@regression` | Full test suite |
-| `@positive` | Expected-success scenarios |
-| `@negative` | Expected-failure / error handling |
+| `@login` | Authentication scenarios |
 | `@add` | Add Employee workflow |
 | `@search` | Search Employee workflow |
-| `@login` | Authentication scenarios |
-| `@data_driven` | Parameterised `Scenario Outline` |
+| `@negative` | Expected-failure / error handling |
+| `@negativeadd` | Expected-failure for add employee |
+| `@negativesearch` | Expected-failure for search employee |
 
 ### Scenario Count by Category
 | Category | Count |
 |---|---|
-| Login | 5 |
-| Add Employee — positive | 5 |
-| Add Employee — negative | 5 |
-| Search Employee — positive | 6 |
+| Login | 3 |
+| Add Employee — positive | 3 |
+| Add Employee — negative | 3 |
+| Search Employee — positive | 5 |
 | Search Employee — negative | 3 |
-| End-to-End | 1 |
-| Data-Driven (Outline × examples) | 8 + 3 = 11 |
-| **Total** | **36** |
+| Data-Driven (Outline × examples) | 4 |
+| **Total** | **21** |
 
 ---
 
@@ -235,7 +220,8 @@ HEADLESS=true behave --tags @smoke
 ### Class Hierarchy
 ```
 BasePage
-  ├── LoginPage          ← /auth/login
+  ├── LoginPage          ← /login
+  ├── HomePage           ← /homepage
   ├── PIMPage            ← /pim/viewEmployeeList (search)
   └── AddEmployeePage    ← /pim/addEmployee
 ```
@@ -247,19 +233,6 @@ BasePage
 - `wait_for_url_contains(url)` — URL assertion helper
 - `take_screenshot(name)` — saves PNG to screenshots/
 
-### Locator Strategy
-All locators use **stable, semantic XPath**:
-```python
-# Prefer label-relative XPath (resilient to layout changes)
-EMPLOYEE_ID_INPUT = (By.XPATH, "//label[text()='Employee Id']/following::input[1]")
-
-# Use button text rather than position
-SAVE_BUTTON = (By.XPATH, "//button[@type='submit'][.//span[text()='Save']]")
-
-# Use name attribute where available (most stable)
-FIRST_NAME_INPUT = (By.NAME, "firstName")
-```
-
 ---
 
 ## 8. GenAI Integration Tasks
@@ -268,27 +241,16 @@ FIRST_NAME_INPUT = (By.NAME, "firstName")
 The entire `features/add_search_employee.feature` was generated by providing
 this prompt to the AI:
 
-> *"Generate a BDD Gherkin feature file for Add and Search Employee in OrangeHRM.
-> Include positive, negative, and edge case scenarios. Use a Background for login.
-> Apply tags: @smoke, @regression, @positive, @negative, @add, @search."*
+> *"The flow includes logging in, navigating to the PIM module, adding employee details, 
+> saving the record, and searching for the employee using the employee ID or name.
+> Include positive and negative scenarios. 
 
 ### Task 2 — Locator Creation
 Locators for all OrangeHRM PIM module elements were generated with:
 
-> *"Generate Selenium locators for the OrangeHRM Add Employee form.
-> Use stable XPath strategies. The page has: firstName (name attr),
-> lastName (name attr), middleName (name attr), Employee ID (label-relative),
-> Save button (submit with span text 'Save')."*
-
-Key generated locators in `pages/pim_page.py`:
-```python
-SEARCH_EMPLOYEE_NAME = (By.XPATH,
-    "//label[text()='Employee Name']/following::input[@placeholder='Type for hints...'][1]")
-SAVE_BUTTON = (By.XPATH,
-    "//button[@type='submit'][.//span[text()='Save']]")
-TABLE_ROWS  = (By.XPATH,
-    "//div[@class='oxd-table-body']//div[@role='row']")
-```
+> *"Generate Selenium locators for the OrangeHRM Login page
+> Dashboard, Add Employee page, search employee
+> Validate the responses and error messages"*
 
 ### Task 3 — Assertion Writing
 GenAI-written assertions in `steps/search_employee_steps.py`:
@@ -374,12 +336,11 @@ Configured in `features/environment.py → after_step()`:
 **Triggers:**
 - `push` to `main`/`develop` → runs `@smoke` only (< 5 min)
 - `pull_request` → runs `@smoke + @regression`
-- Nightly schedule (2 AM UTC) → full suite
 - Manual `workflow_dispatch` → choose tags + browser
 
 **Pipeline steps:**
 1. Checkout code
-2. Set up Python 3.11
+2. Set up Python 3.13
 3. Install Chrome + pip dependencies
 4. Create output directories
 5. Run Behave with selected tags
@@ -390,26 +351,6 @@ Configured in `features/environment.py → after_step()`:
 
 ---
 
-## 11. Docker Execution
-
-### Build and run
-```bash
-cd docker/
-docker-compose build
-docker-compose up tests
-```
-
-### Run specific tags
-```bash
-docker run orangehrm-tests behave --tags @smoke --headless=true
-```
-
-### View reports after run
-```bash
-# Reports are volume-mounted to the host:
-open reports/report.html
-allure serve allure-results
-```
 
 ### Architecture
 ```

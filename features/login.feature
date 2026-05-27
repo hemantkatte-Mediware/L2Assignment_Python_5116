@@ -17,7 +17,7 @@ Scenario: Login fails with invalid credentials
   Then an error message "Invalid credentials" should be displayed
   And the user should remain on the login page
 
-@smoke @login @negative @try @regression
+@smoke @login @negative @regression
 Scenario: Login fails with empty credentials
   When the user submits the login form with empty credentials
   Then required field validation errors should be displayed
