@@ -112,16 +112,16 @@ jobs:
             export FINAL_TAGS="${TAGS}"
           fi
           
-          behave --tags="$FINAL_TAGS" --format allure_behave.formatter:AllureFormatter --outfile "${{ github.workspace }}/allure-results" --format behave_html_formatter:HTMLFormatter --outfile "${{ github.workspace }}/reports/report.html" --format progress2 --no-capture
+          behave --tags="$FINAL_TAGS" --format allure_behave.formatter:AllureFormatter --outfile allure-results --format behave_html_formatter:HTMLFormatter --outfile reports/report.html --format progress2 --no-capture
 
       # 8. Workplace Diagnostics Tracker (Ensures folders aren't blank)
       - name: Generate Directory Diagnostics Log
         if: always()
         run: |
           mkdir -p allure-results
-          echo "Placeholder data keeping upload components active." > allure-results/environment.properties
-          echo "System Context: Environment=${{ github.event.inputs.environment || 'demo' }}" >> allure-results/environment.properties
-          echo "Browser Context: Browser=${{ github.event.inputs.browser || 'chrome' }}" >> allure-results/environment.properties
+          echo "Environment=${{ github.event.inputs.environment || 'demo' }}" > allure-results/environment.properties
+          echo "Browser=${{ github.event.inputs.browser || 'chrome' }}" >> allure-results/environment.properties
+          echo "Execution_Type=CI_Pipeline" >> allure-results/environment.properties
 
       # 9. Upload HTML report
       - name: Upload HTML Report
