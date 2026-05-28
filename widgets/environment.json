@@ -1,1 +1,1 @@
-[{"values":["demo"],"name":"Environment"},{"values":["chrome"],"name":"Browser"},{"values":["CI_Pipeline"],"name":"Execution_Type"}]
+[{"values":["qa"],"name":"Environment"},{"values":["firefox"],"name":"Browser"},{"values":["CI_Pipeline"],"name":"Execution_Type"}]
