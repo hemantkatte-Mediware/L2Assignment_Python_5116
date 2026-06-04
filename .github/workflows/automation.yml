@@ -130,7 +130,7 @@ jobs:
         with:
           name: html-report-${{ github.run_number }}
           path: reports/report.html
-          retention-days: 30
+          retention-days: 7
           if-no-files-found: ignore
 
       # 10. Upload screenshots
@@ -150,7 +150,7 @@ jobs:
         with:
           name: allure-results-${{ github.run_number }}
           path: allure-results/
-          retention-days: 30
+          retention-days: 7
           if-no-files-found: error
 
   # ──────────────────────────────────────────────────────────────────────────
